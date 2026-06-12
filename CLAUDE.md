@@ -289,12 +289,12 @@ git commit -s -m "[타입] 제목"
 ## 개발 순서 (미션2 체크리스트)
 
 - [x] **1단계**: 솔루션 초기 세팅 (SampleOrderSystem / SampleOrderSystemTests / DummyDataGenerator 프로젝트, nlohmann/json, gtest/gmock)
-- [ ] **2단계**: Models — `Sample`(+stock_updated_at), `Order`(OrderStatus enum), `ProductionJob`(+completed_at), `IRepository<T>` ← 파일 작성 완료, 빌드 검증 후 커밋 예정
-- [ ] **3단계**: Repositories — `SampleRepository`, `OrderRepository`, `ProductionRepository`
-- [ ] **4단계**: Controllers — `SampleCtrl`, `OrderCtrl`, `ProductionCtrl`, `ReleaseCtrl`
-- [ ] **5단계**: Views — `MainView`, `SampleView`, `OrderView`, `MonitoringView`, `ProductionView`, `ReleaseView`
-- [ ] **6단계**: 통합 — `main.cpp` 루프, 전체 메뉴 연결
-- [ ] **7단계**: 단위 테스트 — `Test_SampleController`, `Test_OrderController`, `Test_ProductionController` 전체 통과
+- [x] **2단계**: Models — `Sample`(+stock_updated_at), `Order`(OrderStatus enum), `ProductionJob`(+completed_at), `IRepository<T>`
+- [x] **3단계**: Repositories — `SampleRepository`, `OrderRepository`, `ProductionRepository`
+- [x] **4단계**: Controllers — `SampleCtrl`, `OrderCtrl`, `ProductionCtrl`, `ReleaseCtrl`
+- [x] **5단계**: Views — `MainView`, `SampleView`, `OrderView`, `MonitoringView`, `ProductionView`, `ReleaseView`
+- [x] **6단계**: 통합 — `main.cpp` 루프, 전체 메뉴 연결
+- [x] **7단계**: 단위 테스트 — `Test_SampleController`, `Test_OrderController`, `Test_ProductionController` 전체 통과 (16/16 PASS)
 
 ---
 
