@@ -14,18 +14,39 @@ namespace {
 
 MainView::MainView(SampleView* sampleView, OrderView* orderView,
                    ProductionView* productionView, ReleaseView* releaseView,
-                   MonitoringView* monitoringView)
+                   MonitoringView* monitoringView,
+                   SampleController* sampleCtrl, OrderController* orderCtrl,
+                   ProductionController* productionCtrl)
     : m_sampleView(sampleView)
     , m_orderView(orderView)
     , m_productionView(productionView)
     , m_releaseView(releaseView)
-    , m_monitoringView(monitoringView) {}
+    , m_monitoringView(monitoringView)
+    , m_sampleCtrl(sampleCtrl)
+    , m_orderCtrl(orderCtrl)
+    , m_productionCtrl(productionCtrl) {}
+
+void MainView::showSummary() const {
+    auto samples = m_sampleCtrl->getAllSamples();
+    auto orders  = m_orderCtrl->getAllOrders();
+    auto running = m_productionCtrl->getRunningJobs();
+
+    int totalStock = 0;
+    for (const auto& s : samples) totalStock += s.m_stock;
+
+    std::cout << "  시료: " << samples.size() << "종"
+              << "  총 재고: " << totalStock << "ea"
+              << "  주문: " << orders.size() << "건"
+              << "  생산 진행: " << running.size() << "건\n";
+}
 
 void MainView::run() {
     while (true) {
         std::cout << "\n==============================\n"
                   << "  시료 생산주문관리 시스템\n"
-                  << "==============================\n"
+                  << "==============================\n";
+        showSummary();
+        std::cout << "------------------------------\n"
                   << "  1. 시료 관리\n"
                   << "  2. 주문 관리\n"
                   << "  3. 생산 관리\n"

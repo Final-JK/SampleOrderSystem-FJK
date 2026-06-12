@@ -44,7 +44,8 @@ int main() {
     ReleaseView    releaseView(&releaseCtrl);
     MonitoringView monitoringView(&sampleCtrl, &orderCtrl);
     MainView       mainView(&sampleView, &orderView, &productionView,
-                            &releaseView, &monitoringView);
+                            &releaseView, &monitoringView,
+                            &sampleCtrl, &orderCtrl, &productionCtrl);
 
     mainView.run();
     return 0;
