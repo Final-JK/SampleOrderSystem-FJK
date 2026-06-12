@@ -8,7 +8,7 @@
 MonitoringView::MonitoringView(SampleController* sampleCtrl, OrderController* orderCtrl)
     : m_sampleCtrl(sampleCtrl), m_orderCtrl(orderCtrl) {}
 
-void MonitoringView::run() const {
+void MonitoringView::showData() const {
     using CH = ConsoleHelper;
 
     auto samples = m_sampleCtrl->getAllSamples();
@@ -75,5 +75,14 @@ void MonitoringView::run() const {
                   << CH::padRight(status, 8)
                   << '[' << makeBar(s.m_stock) << "]\n";
     }
-    std::cout << '\n';
+}
+
+void MonitoringView::run() const {
+    while (true) {
+        showData();
+        std::cout << "\n  Enter: 새로고침   0: 돌아가기\n  선택: ";
+        std::string input;
+        std::getline(std::cin, input);
+        if (input == "0") break;
+    }
 }
