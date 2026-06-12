@@ -7,6 +7,9 @@
 #include <vector>
 #include <optional>
 
+// 생산 안전 마진: 수율의 90%만 실제 생산에 기여한다고 가정
+static constexpr double PRODUCTION_SAFETY_MARGIN = 0.9;
+
 class OrderController {
 public:
     OrderController(IRepository<Order>* orderRepo,

@@ -58,7 +58,7 @@ bool OrderController::approve(const std::string& orderId) {
         int    shortage   = order.m_quantity - sample.m_stock;
         int    actualProd = static_cast<int>(
                                 std::ceil(static_cast<double>(shortage)
-                                          / (sample.m_yieldRate * 0.9)));
+                                          / (sample.m_yieldRate * PRODUCTION_SAFETY_MARGIN)));
         double totalMins  = sample.m_avgProductionTime * actualProd;
 
         ProductionJob job;
