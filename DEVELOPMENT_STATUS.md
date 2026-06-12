@@ -16,7 +16,7 @@
 | 4단계: Controllers | ✅ 완료 | `[feat] 4단계: Controllers + Utils` |
 | 5단계: Views | ✅ 완료 | `[feat] 5단계: Views` |
 | 6단계: 통합 (main.cpp) | ✅ 완료 | `[feat] 6단계: 통합` |
-| 7단계: 단위 테스트 | ⏳ 미착수 | - |
+| 7단계: 단위 테스트 | ✅ 완료 | `[feat] 7단계: 단위 테스트 (16/16 PASS)` |
 
 ---
 
