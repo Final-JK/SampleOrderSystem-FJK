@@ -5,20 +5,6 @@
 #include <cstdio>
 #include <limits>
 
-namespace {
-    int readInt(const std::string& prompt) {
-        std::cout << prompt;
-        std::string s; std::cin >> s;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        try { return std::stoi(s); } catch (...) { return -1; }
-    }
-    std::string readLine(const std::string& prompt) {
-        std::cout << prompt;
-        std::string s; std::getline(std::cin, s);
-        return s;
-    }
-}
-
 SampleView::SampleView(SampleController* ctrl) : m_ctrl(ctrl) {}
 
 void SampleView::showList() const {
@@ -45,9 +31,9 @@ void SampleView::showList() const {
 }
 
 void SampleView::showSearch() const {
-    std::string kw = readLine("  검색어: ");
-    if (kw.empty()) return;
     using CH = ConsoleHelper;
+    std::string kw = CH::readLine("  검색어: ");
+    if (kw.empty()) return;
     auto results = m_ctrl->searchByName(kw);
     if (results.empty()) { std::cout << "  검색 결과 없음.\n"; return; }
     std::cout << '\n'
@@ -60,7 +46,7 @@ void SampleView::showSearch() const {
 }
 
 void SampleView::showAdd() {
-    std::string name = readLine("  시료명: ");
+    std::string name = ConsoleHelper::readLine("  시료명: ");
     if (name.empty()) return;
     double avgTime = 0.0, yieldRate = 0.0;
     int stock = 0;
@@ -80,7 +66,7 @@ void SampleView::run() {
                   << "  2. 이름 검색\n"
                   << "  3. 시료 등록\n"
                   << "  0. 돌아가기\n";
-        int ch = readInt("  선택: ");
+        int ch = ConsoleHelper::readInt("  선택: ");
         if      (ch == 1) showList();
         else if (ch == 2) showSearch();
         else if (ch == 3) showAdd();

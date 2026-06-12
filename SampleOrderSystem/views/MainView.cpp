@@ -1,16 +1,7 @@
 #include "views/MainView.h"
+#include "utils/ConsoleHelper.h"
 #include <iostream>
 #include <string>
-#include <limits>
-
-namespace {
-    int readInt(const std::string& prompt) {
-        std::cout << prompt;
-        std::string s; std::cin >> s;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        try { return std::stoi(s); } catch (...) { return -1; }
-    }
-}
 
 MainView::MainView(SampleView* sampleView, OrderView* orderView,
                    ProductionView* productionView, ReleaseView* releaseView,
@@ -53,7 +44,7 @@ void MainView::run() {
                   << "  4. 출고 관리\n"
                   << "  5. 재고 모니터링\n"
                   << "  0. 종료\n";
-        int ch = readInt("  선택: ");
+        int ch = ConsoleHelper::readInt("  선택: ");
         if      (ch == 1) m_sampleView->run();
         else if (ch == 2) m_orderView->run();
         else if (ch == 3) m_productionView->run();

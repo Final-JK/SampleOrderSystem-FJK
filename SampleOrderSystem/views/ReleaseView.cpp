@@ -2,21 +2,6 @@
 #include "utils/ConsoleHelper.h"
 #include <iostream>
 #include <string>
-#include <limits>
-
-namespace {
-    int readInt(const std::string& prompt) {
-        std::cout << prompt;
-        std::string s; std::cin >> s;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        try { return std::stoi(s); } catch (...) { return -1; }
-    }
-    std::string readLine(const std::string& prompt) {
-        std::cout << prompt;
-        std::string s; std::getline(std::cin, s);
-        return s;
-    }
-}
 
 ReleaseView::ReleaseView(ReleaseController* ctrl) : m_ctrl(ctrl) {}
 
@@ -39,7 +24,7 @@ void ReleaseView::showConfirmed() const {
 
 void ReleaseView::showRelease() {
     showConfirmed();
-    std::string id = readLine("  출고 처리할 주문 ID: ");
+    std::string id = ConsoleHelper::readLine("  출고 처리할 주문 ID: ");
     if (id.empty()) return;
     std::cout << (m_ctrl->release(id) ? "  출고 처리 완료.\n" : "  처리 실패.\n");
 }
@@ -50,7 +35,7 @@ void ReleaseView::run() {
                   << "  1. 출고 대기 목록\n"
                   << "  2. 출고 처리\n"
                   << "  0. 돌아가기\n";
-        int ch = readInt("  선택: ");
+        int ch = ConsoleHelper::readInt("  선택: ");
         if      (ch == 1) showConfirmed();
         else if (ch == 2) showRelease();
         else if (ch == 0) break;

@@ -1,5 +1,7 @@
 #include "utils/ConsoleHelper.h"
 #include <cstdint>
+#include <iostream>
+#include <limits>
 
 int ConsoleHelper::displayWidth(const std::string& s) {
     int width = 0;
@@ -47,4 +49,19 @@ std::string ConsoleHelper::padLeft(const std::string& s, int targetWidth) {
     int w = displayWidth(s);
     if (w >= targetWidth) return s;
     return std::string(targetWidth - w, ' ') + s;
+}
+
+int ConsoleHelper::readInt(const std::string& prompt) {
+    std::cout << prompt;
+    std::string s;
+    std::cin >> s;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    try { return std::stoi(s); } catch (...) { return -1; }
+}
+
+std::string ConsoleHelper::readLine(const std::string& prompt) {
+    std::cout << prompt;
+    std::string s;
+    std::getline(std::cin, s);
+    return s;
 }
