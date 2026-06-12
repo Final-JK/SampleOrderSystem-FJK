@@ -27,13 +27,13 @@ void ReleaseView::showConfirmed() const {
     std::cout << '\n'
               << CH::padRight("주문ID", 22)
               << CH::padRight("시료ID", 8)
-              << CH::padRight("고객사", 16)
+              << CH::padRight("고객사", 20)
               << "수량\n"
-              << std::string(52, '-') << '\n';
+              << std::string(54, '-') << '\n';
     for (const auto& o : orders)
         std::cout << CH::padRight(o.m_orderId, 22)
                   << CH::padRight(o.m_sampleId, 8)
-                  << CH::padRight(o.m_customer, 16)
+                  << CH::padRight(o.m_customer, 20)
                   << o.m_quantity << '\n';
 }
 

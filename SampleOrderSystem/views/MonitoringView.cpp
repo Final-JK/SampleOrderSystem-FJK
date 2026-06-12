@@ -54,7 +54,7 @@ void MonitoringView::run() const {
 
     std::cout << '\n'
               << CH::padRight("ID", 8)
-              << CH::padRight("이름", 26)
+              << CH::padRight("이름", 24)
               << CH::padRight("재고", 6)
               << CH::padRight("확정량", 8)
               << CH::padRight("상태", 8)
@@ -69,7 +69,7 @@ void MonitoringView::run() const {
         else                                 status = "여유";
 
         std::cout << CH::padRight(s.m_sampleId, 8)
-                  << CH::padRight(s.m_name, 26)
+                  << CH::padRight(s.m_name, 24)
                   << CH::padRight(std::to_string(s.m_stock), 6)
                   << CH::padRight(std::to_string(confirmed), 8)
                   << CH::padRight(status, 8)

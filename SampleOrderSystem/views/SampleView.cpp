@@ -25,18 +25,19 @@ void SampleView::showList() const {
     using CH = ConsoleHelper;
     auto samples = m_ctrl->getAllSamples();
     if (samples.empty()) { std::cout << "  등록된 시료가 없습니다.\n"; return; }
+    // ID(8) + 이름(24) + 생산시간(12) + 수율(8) + 재고(last,max4) = 56
     std::cout << '\n'
               << CH::padRight("ID", 8)
-              << CH::padRight("이름", 26)
+              << CH::padRight("이름", 24)
               << CH::padRight("생산시간", 12)
               << CH::padRight("수율", 8)
               << "재고\n"
-              << std::string(62, '-') << '\n';
+              << std::string(56, '-') << '\n';
     for (const auto& s : samples) {
         char timeBuf[16]; std::snprintf(timeBuf, sizeof(timeBuf), "%.1fh", s.m_avgProductionTime);
         char rateBuf[8];  std::snprintf(rateBuf, sizeof(rateBuf), "%.0f%%", s.m_yieldRate * 100);
         std::cout << CH::padRight(s.m_sampleId, 8)
-                  << CH::padRight(s.m_name, 26)
+                  << CH::padRight(s.m_name, 24)
                   << CH::padRight(timeBuf, 12)
                   << CH::padRight(rateBuf, 8)
                   << s.m_stock << '\n';
@@ -51,11 +52,11 @@ void SampleView::showSearch() const {
     if (results.empty()) { std::cout << "  검색 결과 없음.\n"; return; }
     std::cout << '\n'
               << CH::padRight("ID", 8)
-              << CH::padRight("이름", 26)
+              << CH::padRight("이름", 24)
               << "재고\n"
-              << std::string(42, '-') << '\n';
+              << std::string(36, '-') << '\n';
     for (const auto& s : results)
-        std::cout << CH::padRight(s.m_sampleId, 8) << CH::padRight(s.m_name, 26) << s.m_stock << '\n';
+        std::cout << CH::padRight(s.m_sampleId, 8) << CH::padRight(s.m_name, 24) << s.m_stock << '\n';
 }
 
 void SampleView::showAdd() {
