@@ -16,6 +16,23 @@ void MonitoringView::run() const {
 
     if (samples.empty()) { std::cout << "  등록된 시료가 없습니다.\n"; return; }
 
+    // 상태별 주문 건수 (REJECTED 제외)
+    int cntReserved = 0, cntConfirmed = 0, cntProducing = 0, cntRelease = 0;
+    for (const auto& o : orders) {
+        switch (o.m_status) {
+            case OrderStatus::RESERVED:  ++cntReserved;  break;
+            case OrderStatus::CONFIRMED: ++cntConfirmed; break;
+            case OrderStatus::PRODUCING: ++cntProducing; break;
+            case OrderStatus::RELEASE:   ++cntRelease;   break;
+            default: break;
+        }
+    }
+    std::cout << "\n[주문 현황]\n"
+              << "  대기(RESERVED): "   << cntReserved
+              << "  확정(CONFIRMED): "  << cntConfirmed
+              << "  생산중(PRODUCING): " << cntProducing
+              << "  출고(RELEASE): "    << cntRelease << "\n\n";
+
     // 시료별 CONFIRMED 주문 수량 합산
     auto confirmedSum = [&](const std::string& sampleId) {
         int sum = 0;
