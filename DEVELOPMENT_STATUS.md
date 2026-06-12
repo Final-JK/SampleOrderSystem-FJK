@@ -256,6 +256,9 @@ int main(int argc, char** argv) {
 | `Sample.stock_updated_at` | 없음 | **추가** | 모니터링에서 재고 갱신 시각 표시 필요 |
 | `ProductionJob.completed_at` | 없음 | **추가** | 생산 완료 시각 추적 필요 |
 | DummyDataGenerator 소스 | 독립 구현 | 본 프로젝트 models 공유 | JSON 포맷 일관성 보장 |
+| `.gitignore` | `*.pdf`만 제외 | **x64/, .vs/, 빌드 아티팩트 패턴 추가** | 빌드 산출물이 git에 포함되는 문제 발견 후 보완 |
+| gtest/gmock `custom/` 헤더 | third_party 배포 시 포함 가정 | **5개 파일 수동 추가** (`gtest-port.h`, `gtest-printers.h`, `gmock-port.h`, `gmock-matchers.h`, `gmock-generated-actions.h`) | PoC에서는 NuGet 방식 사용 — 본 프로젝트 amalgamation 방식에서는 해당 파일이 누락됨을 런타임에 발견 |
+| Repository의 날짜 기반 ID 생성 | `DateTimeHelper` 의존 예정 | **Repository .cpp 내부 로컬 헬퍼로 처리** | `DateTimeHelper`는 4단계(utils) 산출물이므로 3단계 Repository가 의존하면 계층 역전 발생. 로컬 `static std::string todayCompact()` 인라인으로 의존성 제거 |
 
 ---
 
