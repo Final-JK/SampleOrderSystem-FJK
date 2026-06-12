@@ -14,8 +14,8 @@
 | 2단계: Models + IRepository | 🔶 파일 작성 완료, 커밋 대기 | 다음 세션에서 빌드 검증 후 커밋 |
 | 3단계: Repositories | ✅ 완료 | `[feat] 3단계: Repositories` |
 | 4단계: Controllers | ✅ 완료 | `[feat] 4단계: Controllers + Utils` |
-| 5단계: Views | ⏳ 미착수 | - |
-| 6단계: 통합 (main.cpp) | ⏳ 미착수 | - |
+| 5단계: Views | ✅ 완료 | `[feat] 5단계: Views` |
+| 6단계: 통합 (main.cpp) | ✅ 완료 | `[feat] 6단계: 통합` |
 | 7단계: 단위 테스트 | ⏳ 미착수 | - |
 
 ---
