@@ -14,14 +14,14 @@
 | 항목 | 선택 |
 |---|---|
 | 언어 | C++17 |
-| IDE | Visual Studio 2022 Community |
+| IDE | Visual Studio Community 2026 |
 | 빌드 시스템 | MSBuild (.sln / .vcxproj) |
 | 데이터 영속성 | JSON 파일 (nlohmann/json 헤더 라이브러리) |
 | 테스트 | Google Test (gtest) |
 | 아키텍처 | MVC (콘솔 기반) |
 
 ### 1.4 범위
-- 콘솔(CLI) 기반 단일 실행 파일
+- 콘솔(CLI) 기반 실행 파일 3종 (SampleOrderSystem / SampleOrderSystemTests / DummyDataGenerator)
 - MVC 아키텍처 적용
 - 단일 생산 라인, FIFO 스케줄링
 - 애플리케이션 재실행 후에도 데이터 유지 (JSON 파일 영속성)
@@ -242,10 +242,17 @@ SampleOrderSystem.sln
 │       ├── samples.json
 │       ├── orders.json
 │       └── production_jobs.json
-├── SampleOrderSystemTests/     # Google Test 프로젝트
-│   ├── test_sample.cpp
-│   ├── test_order.cpp
-│   └── test_production.cpp
+├── SampleOrderSystemTests/     # Google Test 프로젝트 (gtest/gmock)
+│   ├── test_main.cpp
+│   ├── Test_SampleController.cpp
+│   ├── Test_OrderController.cpp
+│   ├── Test_ProductionController.cpp
+│   └── mocks/
+│       ├── MockSampleRepository.h
+│       ├── MockOrderRepository.h
+│       └── MockProductionRepository.h
+├── DummyDataGenerator/         # 독립 실행 파일 (더미 데이터 생성)
+│   └── main.cpp
 └── third_party/
     └── nlohmann/
         └── json.hpp            # 헤더 전용 JSON 라이브러리
@@ -265,8 +272,75 @@ SampleOrderSystem.sln
 
 - **데이터 영속성**: JSON 파일 저장, 재실행 시 데이터 유지
 - **언어**: C++17
-- **빌드**: MSBuild (Visual Studio 2022 Community)
-- **외부 라이브러리**: nlohmann/json (헤더 전용), Google Test
+- **빌드**: MSBuild (Visual Studio Community 2026)
+- **외부 라이브러리**: nlohmann/json (헤더 전용), Google Test (gtest/gmock)
 - **커밋**: 기능 단위로 의미 있는 커밋 이력 유지
 - **코드**: CleanCode 원칙, 불필요한 주석 최소화
 - **모델**: Claude Sonnet / Effort Medium 사용
+
+---
+
+## 8. 개발 방향성
+
+### 8.1 PoC 코드 기반 구현
+
+SampleOrderSystem의 기본 코드는 PoC에서 검증된 코드를 기반으로 작성한다.
+PoC에서 동작이 확인된 구현은 재작성하지 않고 직접 가져와 재사용한다.
+
+### 8.2 PoC 직접 통합 범위
+
+아래 3개 PoC는 코드를 SampleOrderSystem에 **직접 포함**한다.
+
+| PoC | Repository | 통합 대상 |
+|---|---|---|
+| PoC-1 ConsoleMVC | ConsoleMVC-FJK | MVC 골격 구조 (View / Controller / Model 계층 분리) |
+| PoC-2 DataPersistence | DataPersistence-FJK | `IRepository<T>` 패턴, nlohmann/json CRUD 구현 |
+| PoC-3 DataMonitor | DataMonitor-FJK | 상태별 집계, 재고 판정 로직, 모니터링 출력 형식 |
+
+> PoC-4 DummyDataGenerator는 SampleOrderSystem 코드에 직접 병합하지 않는다. 솔루션 내 독립 프로젝트로 추가하여 별도 실행 파일로 관리한다. 상세 내용은 8.3 참조.
+
+### 8.3 DummyDataGenerator 독립 프로젝트 운영
+
+PoC-4 DummyDataGenerator는 SampleOrderSystem과 **별도의 독립 실행 파일**로 구성한다.
+
+- 솔루션 내 별도 프로젝트(`DummyDataGenerator`)로 추가하되, 메인 앱·테스트와 독립적으로 빌드된다
+- **트리거 규칙**: `models/` 하위 파일(JSON 직렬화 관련 코드)이 변경될 때마다 DummyDataGenerator도 함께 빌드한다
+  - JSON 포맷 변경이 더미 데이터 생성기에 즉시 반영되지 않으면 데이터 불일치가 발생하기 때문이다
+- DummyDataGenerator는 `unit-test` / `app-build` 에이전트의 검증 대상에 포함되지 않는다
+  - 단, JSON 포맷 변경 감지 트리거에 의한 빌드는 별도로 수행한다
+
+### 8.4 솔루션 프로젝트 구성 및 소스 공유 원칙
+
+솔루션(`SampleOrderSystem.sln`) 내 프로젝트는 아래와 같이 구성한다.
+
+| 프로젝트 | 종류 | 설명 |
+|---|---|---|
+| `SampleOrderSystem` | 실행 파일 | 서비스용 메인 앱 |
+| `SampleOrderSystemTests` | 실행 파일 (gtest/gmock) | 단위 테스트 |
+| `DummyDataGenerator` | 실행 파일 | 더미 데이터 생성 도구 (독립 실행) |
+
+**소스 공유 원칙**
+
+- `SampleOrderSystem`과 `SampleOrderSystemTests`는 **동일한 소스 파일**(`models/`, `repositories/`, `controllers/`, `utils/`)을 참조한다
+- 중복 복사 금지 — 각 `.vcxproj`에서 공통 소스를 상대 경로로 직접 참조한다
+- `main.cpp`만 각 프로젝트에서 별도로 관리한다 (`SampleOrderSystem/main.cpp`, `SampleOrderSystemTests/test_main.cpp`)
+
+**병렬 빌드**
+
+- `SampleOrderSystem`과 `SampleOrderSystemTests`는 서로 의존성이 없으므로 MSBuild가 병렬로 빌드할 수 있다
+- Stop 훅의 `Start-Job` 병렬 실행으로 두 프로젝트를 동시에 검증한다
+
+### 8.5 테스트 코드 네이밍 규칙
+
+테스트 전용 코드는 이름만으로 테스트 목적임이 명확히 드러나야 한다.
+
+| 대상 | 규칙 | 예시 |
+|---|---|---|
+| 테스트 소스 파일 | `Test_` 접두사 | `Test_SampleController.cpp` |
+| 테스트 클래스 | `Test` 접미사 | `SampleControllerTest` |
+| Mock 클래스 | `Mock` 접두사 | `MockSampleRepository` |
+| 테스트 픽스처 | `Fixture` 접미사 | `OrderControllerFixture` |
+| gtest Suite 이름 | 클래스명과 동일 | `TEST_F(SampleControllerTest, ...)` |
+
+- 프로덕션 코드(`models/`, `repositories/`, `controllers/`)에 테스트 전용 코드를 혼재하지 않는다
+- Mock 객체는 `SampleOrderSystemTests/mocks/` 디렉토리에 분리하여 관리한다

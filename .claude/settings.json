@@ -1,0 +1,37 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if(-not(Test-Path 'SampleOrderSystem.sln')){exit 0}; $mb='C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe'; $sln='SampleOrderSystem.sln'; $j1=Start-Job{param($m,$s)& $m $s /t:SampleOrderSystemTests /p:Configuration=Debug /p:Platform=x64 /v:minimal 2>&1}-ArgumentList $mb,$sln; $j2=Start-Job{param($m,$s)& $m $s /t:SampleOrderSystem /p:Configuration=Debug /p:Platform=x64 /v:minimal 2>&1}-ArgumentList $mb,$sln; Wait-Job $j1,$j2|Out-Null; $r1=Receive-Job $j1; $r2=Receive-Job $j2; Remove-Job $j1,$j2; $f=@(); if(($r1-join' ')-match'Build FAILED'){$f+='[unit-test]'}; if(($r2-join' ')-match'Build FAILED'){$f+='[app-build]'}; if($f.Count-gt 0){Write-Output ('빌드 실패: '+($f-join', ')); Write-Output '--- unit-test ---'; $r1; Write-Output '--- app-build ---'; $r2; Write-Output '[MANDATORY] 모든 작업을 즉시 중단하고 사용자의 지시를 기다리세요.'; exit 2}; Write-Output '[unit-test] PASS | [app-build] PASS'",
+            "shell": "powershell",
+            "timeout": 120,
+            "asyncRewake": true,
+            "statusMessage": "빌드 검증 중 (unit-test & app-build 병렬)...",
+            "rewakeMessage": "[빌드 검증 실패] CLAUDE.md의 MANDATORY 규칙에 따라 즉시 작업을 중단하고 아래 내용을 사용자에게 보고한 후 지시를 기다리세요:",
+            "rewakeSummary": "빌드 실패 — 작업 중단 및 사용자 확인 필요"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$j=[System.Console]::In.ReadToEnd()|ConvertFrom-Json; $fp=$j.tool_input.file_path; if(-not($fp-match '(\\\\|/)models(\\\\|/)')){exit 0}; if(-not(Test-Path 'SampleOrderSystem.sln')){exit 0}; $mb='C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\amd64\\MSBuild.exe'; Write-Output '[DummyDataGenerator] models/ 변경 감지 — 빌드 시작...'; $r=& $mb SampleOrderSystem.sln /t:DummyDataGenerator /p:Configuration=Debug /p:Platform=x64 /v:minimal 2>&1; if($LASTEXITCODE-ne 0){Write-Output '[DummyDataGenerator] FAIL'; $r; exit 2}; Write-Output '[DummyDataGenerator] PASS'",
+            "shell": "powershell",
+            "timeout": 60,
+            "asyncRewake": true,
+            "statusMessage": "DummyDataGenerator 빌드 중 (models/ 변경 감지)...",
+            "rewakeMessage": "[DummyDataGenerator 빌드 실패] models/ 변경 후 DummyDataGenerator 빌드가 실패했습니다. 즉시 작업을 중단하고 사용자에게 보고한 후 지시를 기다리세요:",
+            "rewakeSummary": "DummyDataGenerator 빌드 실패 — 사용자 확인 필요"
+          }
+        ]
+      }
+    ]
+  }
+}

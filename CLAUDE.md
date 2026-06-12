@@ -7,11 +7,50 @@
 
 ---
 
+## [MANDATORY] 빌드 검증 강제 규칙
+
+> **이 규칙은 예외 없이 적용된다. 어떤 상황에서도 우회하지 않는다.**
+> Claude는 이 규칙을 지시로 인식하며, 아래 조건이 충족될 때마다 반드시 수행한다.
+
+### 트리거 조건
+
+`.cpp` 또는 `.h` 파일 변경이 완료된 직후 (feature 단위 구현 완료 시점).
+
+### 필수 수행 절차
+
+**[자동]** Stop 훅이 Claude가 작업을 마칠 때마다 `SampleOrderSystemTests`와 `SampleOrderSystem`을 자동으로 병렬 빌드한다.
+빌드가 실패하면 훅이 Claude를 재활성화(rewake)하고 FAIL 내용을 전달한다.
+
+**[수동]** 단계 완료 전 명시적 검증이 필요한 경우: `unit-test`, `app-build` 에이전트를 병렬로 직접 호출한다.
+
+두 경우 모두 FAIL이 확인되는 즉시 아래 강제 중단 규칙을 적용한다.
+
+### FAIL 시 강제 중단 규칙
+
+**둘 중 하나라도 FAIL이면 즉시 아래를 수행하고 멈춘다. 예외 없음.**
+
+1. 진행 중이던 모든 작업을 **즉시 중단**한다 — 다음 단계 착수 절대 금지
+2. 독단적 수정 시도 금지 — 사용자 허가 없이 오류를 자의적으로 수정하지 않는다
+3. 사용자에게 다음을 보고한다:
+   - 어떤 빌드가 실패했는지 (`unit-test` / `app-build` / 둘 다)
+   - 핵심 오류 메시지 요약 (컴파일 에러, 테스트 실패 항목)
+4. 사용자의 명시적 지시가 올 때까지 **대기**한다
+
+### 금지 사항 (절대 금지)
+
+| 금지 행동 | 이유 |
+|---|---|
+| 빌드 실패 무시하고 다음 단계 진행 | 깨진 상태로 쌓이는 코드는 복구 비용이 기하급수적 |
+| 빌드 확인 없이 완료 선언 | 실제 동작을 검증하지 않은 완료는 완료가 아님 |
+| 사용자 허가 없이 오류 자의적 수정 후 재시도 | 수정 방향은 사용자가 결정해야 함 |
+
+---
+
 ## 과제 배경 및 현재 상태
 
 ### 진행 경위
 - 총괄 관리 공간(`Project_S-Semi`)에서 전체 과제를 기획하고 PoC 4개를 먼저 완료했다
-- PoC는 각자 독립 Repository로 구현된 **참고용 프로젝트**이며, 이 프로젝트에 직접 영향을 주지 않는다
+- PoC-1/2/3 코드는 본 시스템에 **직접 포함**한다. PoC-4(DummyDataGenerator)는 솔루션 내 독립 프로젝트로 분리한다 (PRD.md 8.2, 8.3 참조)
 - 이제 PoC에서 검증한 패턴을 바탕으로 본 시스템을 구현한다
 
 ### PoC 완료 현황 (GitHub 참조)
@@ -62,7 +101,8 @@ SampleOrderSystem-FJK/
 │       ├── samples.json
 │       ├── orders.json
 │       └── production_jobs.json
-└── SampleOrderSystemTests/     ← Google Test 프로젝트
+├── SampleOrderSystemTests/     ← Google Test 프로젝트 (gtest/gmock)
+└── DummyDataGenerator/         ← 독립 실행 파일 (더미 데이터 생성)
 ```
 
 ### 계층별 역할
@@ -128,6 +168,10 @@ double totalTimeMins = sample.avgProductionTime * actualProd;
 # 클린 빌드
 & "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" `
     .\SampleOrderSystem.sln /t:Clean,Build /p:Configuration=Debug /p:Platform=x64
+
+# DummyDataGenerator 단독 빌드 (models/ 변경 후 수동 검증 시)
+& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" `
+    .\SampleOrderSystem.sln /t:DummyDataGenerator /p:Configuration=Debug /p:Platform=x64
 ```
 
 ---
@@ -153,13 +197,13 @@ git commit -s -m "[타입] 제목"
 
 ## 개발 순서 (미션2 체크리스트)
 
-- [ ] **1단계**: 솔루션 초기 세팅 (메인 + 테스트 프로젝트, nlohmann/json, gtest)
+- [ ] **1단계**: 솔루션 초기 세팅 (SampleOrderSystem / SampleOrderSystemTests / DummyDataGenerator 프로젝트, nlohmann/json, gtest/gmock)
 - [ ] **2단계**: Models — `Sample`, `Order`(OrderStatus enum), `ProductionJob`
 - [ ] **3단계**: Repositories — `IRepository<T>`, `SampleRepo`, `OrderRepo`, `ProductionRepo`
 - [ ] **4단계**: Controllers — `SampleCtrl`, `OrderCtrl`, `ProductionCtrl`, `ReleaseCtrl`
 - [ ] **5단계**: Views — `MainView`, `SampleView`, `OrderView`, `MonitoringView`, `ProductionView`, `ReleaseView`
 - [ ] **6단계**: 통합 — `main.cpp` 루프, 전체 메뉴 연결
-- [ ] **7단계**: 단위 테스트 — `test_sample`, `test_order`, `test_production` 전체 통과
+- [ ] **7단계**: 단위 테스트 — `Test_SampleController`, `Test_OrderController`, `Test_ProductionController` 전체 통과
 
 ---
 
