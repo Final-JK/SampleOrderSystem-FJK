@@ -46,6 +46,40 @@
 
 ---
 
+## [MANDATORY] 단계별 커밋 강제 규칙
+
+> **이 규칙은 빌드 검증 규칙과 동일한 강제성을 가진다. 예외 없이 적용된다.**
+
+### 커밋 트리거 조건
+
+아래 단계 중 **하나가 완전히 완료**될 때 반드시 커밋을 수행한다.
+
+| 단계 | 커밋 타이밍 |
+|---|---|
+| 1단계 솔루션 세팅 | .sln, .vcxproj, third_party/ 완성 후 |
+| 2단계 Models | 모든 모델 h/cpp + IRepository.h 완성 후 |
+| 3단계 Repositories | 모든 Repository h/cpp 완성 후 |
+| 4단계 Controllers | 모든 Controller h/cpp 완성 후 |
+| 5단계 Views | 모든 View h/cpp 완성 후 |
+| 6단계 통합 | main.cpp + DummyDataGenerator/main.cpp 완성 후 |
+| 7단계 단위 테스트 | 모든 테스트 파일 + 전체 PASS 확인 후 |
+
+### 커밋 전 필수 조건
+
+1. 해당 단계의 **빌드 검증이 PASS** 상태여야 한다 (FAIL 상태에서 커밋 금지)
+2. 커밋 메시지는 `[feat] N단계: 설명` 형태로 작성한다
+3. 커밋 후 `DEVELOPMENT_STATUS.md`의 진행 상황을 갱신한다
+
+### 금지 사항
+
+| 금지 행동 | 이유 |
+|---|---|
+| 단계 완료 후 커밋 없이 다음 단계 착수 | 중간 복구 지점이 없으면 디버깅 비용 급증 |
+| 여러 단계를 묶어 한 번에 커밋 | 단계별 이력 추적이 불가능해짐 |
+| 빌드 실패 상태로 커밋 | 깨진 상태를 이력에 남기지 않는다 |
+
+---
+
 ## 과제 배경 및 현재 상태
 
 ### 진행 경위
@@ -197,9 +231,9 @@ git commit -s -m "[타입] 제목"
 
 ## 개발 순서 (미션2 체크리스트)
 
-- [ ] **1단계**: 솔루션 초기 세팅 (SampleOrderSystem / SampleOrderSystemTests / DummyDataGenerator 프로젝트, nlohmann/json, gtest/gmock)
-- [ ] **2단계**: Models — `Sample`, `Order`(OrderStatus enum), `ProductionJob`
-- [ ] **3단계**: Repositories — `IRepository<T>`, `SampleRepo`, `OrderRepo`, `ProductionRepo`
+- [x] **1단계**: 솔루션 초기 세팅 (SampleOrderSystem / SampleOrderSystemTests / DummyDataGenerator 프로젝트, nlohmann/json, gtest/gmock)
+- [ ] **2단계**: Models — `Sample`(+stock_updated_at), `Order`(OrderStatus enum), `ProductionJob`(+completed_at), `IRepository<T>` ← 파일 작성 완료, 빌드 검증 후 커밋 예정
+- [ ] **3단계**: Repositories — `SampleRepository`, `OrderRepository`, `ProductionRepository`
 - [ ] **4단계**: Controllers — `SampleCtrl`, `OrderCtrl`, `ProductionCtrl`, `ReleaseCtrl`
 - [ ] **5단계**: Views — `MainView`, `SampleView`, `OrderView`, `MonitoringView`, `ProductionView`, `ReleaseView`
 - [ ] **6단계**: 통합 — `main.cpp` 루프, 전체 메뉴 연결
