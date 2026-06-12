@@ -1,2 +1,26 @@
+# Build outputs
+x64/
+Debug/
+Release/
+*.obj
+*.pdb
+*.idb
+*.ilk
+*.exe
+*.dll
+*.lib
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.aps
+*.ncb
+*.sdf
+*.opensdf
+ipch/
+*.VC.db
+*.VC.opendb
+
 # PDF
 *.pdf
