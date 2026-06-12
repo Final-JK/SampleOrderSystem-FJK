@@ -14,11 +14,8 @@ std::vector<ProductionJob> ProductionController::getAllJobs() const {
 }
 
 std::vector<ProductionJob> ProductionController::getRunningJobs() const {
-    auto all = m_productionRepo->findAll();
-    std::vector<ProductionJob> result;
-    for (const auto& j : all)
-        if (j.m_status == JobStatus::RUNNING) result.push_back(j);
-    return result;
+    return m_productionRepo->findBy(
+        [](const ProductionJob& j) { return j.m_status == JobStatus::RUNNING; });
 }
 
 bool ProductionController::completeJob(const std::string& jobId) {

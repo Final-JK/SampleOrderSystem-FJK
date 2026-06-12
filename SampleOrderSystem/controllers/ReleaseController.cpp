@@ -6,11 +6,8 @@ ReleaseController::ReleaseController(IRepository<Order>* orderRepo)
     : m_orderRepo(orderRepo) {}
 
 std::vector<Order> ReleaseController::getConfirmedOrders() const {
-    auto all = m_orderRepo->findAll();
-    std::vector<Order> result;
-    for (const auto& o : all)
-        if (o.m_status == OrderStatus::CONFIRMED) result.push_back(o);
-    return result;
+    return m_orderRepo->findBy(
+        [](const Order& o) { return o.m_status == OrderStatus::CONFIRMED; });
 }
 
 bool ReleaseController::release(const std::string& orderId) {

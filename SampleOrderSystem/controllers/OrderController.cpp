@@ -11,11 +11,8 @@ OrderController::OrderController(IRepository<Order>*         orderRepo,
     , m_productionRepo(productionRepo) {}
 
 std::vector<Order> OrderController::getReservedOrders() const {
-    auto all = m_orderRepo->findAll();
-    std::vector<Order> result;
-    for (const auto& o : all)
-        if (o.m_status == OrderStatus::RESERVED) result.push_back(o);
-    return result;
+    return m_orderRepo->findBy(
+        [](const Order& o) { return o.m_status == OrderStatus::RESERVED; });
 }
 
 std::vector<Order> OrderController::getAllOrders() const {

@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <functional>
 
 template<typename T>
 class IRepository {
@@ -13,4 +14,11 @@ public:
     virtual bool remove(const std::string& id) = 0;
     virtual bool load() = 0;
     virtual bool flush() = 0;
+
+    std::vector<T> findBy(std::function<bool(const T&)> predicate) const {
+        std::vector<T> result;
+        for (const auto& item : findAll())
+            if (predicate(item)) result.push_back(item);
+        return result;
+    }
 };
